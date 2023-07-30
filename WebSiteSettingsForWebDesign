@@ -7,7 +7,7 @@ game.Players.LocalPlayer:GetMouse().KeyDown:Connect(function(key)
                         rawset(v, "Seconds", 0.001) 
                     end
                 end
-			      end
+	    end
       	end
     end
 end)
