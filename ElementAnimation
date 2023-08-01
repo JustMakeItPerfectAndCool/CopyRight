@@ -1,0 +1,630 @@
+getgenv().ServerHop = true
+
+repeat wait() until game:IsLoaded()
+
+local SelfVersion = "TestingVersion: 1.1"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ProBaconHub/BackStage/main/Mad%20City"))()
+if ProBaconHubMadAutoClubVersion ~= SelfVersion then
+	game.Players.LocalPlayer:Kick("OutDatedVersion")
+	error("OutDate")
+	task.wait(9e9)
+	task.wait(math.huge)
+elseif not ProBaconHubMadAutoClubAvalable then
+	game.Players.LocalPlayer:Kick("MadAutoRob V2 has been shutted down by ProBacon")
+	error("SuttedDown")
+	task.wait(9e9)
+	task.wait(math.huge)
+end
+
+local u1 = require(game:GetService("ReplicatedStorage").Aero.Shared.Util)
+--Functions
+function Notify(txt)
+	game.StarterGui:SetCore("SendNotification", {Title="ProBaconHub"; Text="🟢Status: "..txt; Duration=17;})
+end
+function tp(x, y, z, speed)
+	game.Players.LocalPlayer.Character.Humanoid.Sit = false
+    local targetPosition = Vector3.new(x, y, z)
+    local speed = speed
+    local maxForce = Vector3.new(math.huge, math.huge, math.huge)
+    
+    local velocity = Instance.new("BodyVelocity")
+    velocity.MaxForce = maxForce
+    velocity.Velocity = Vector3.new(0, 0, 0)
+    velocity.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+    
+    while true do
+		game.Players.LocalPlayer.Character.Humanoid.Sit = false
+        local currentPos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        local direction = (targetPosition - currentPos).unit
+        local distance = (targetPosition - currentPos).magnitude
+        local distanceCheck = speed/30
+        if distance >= distanceCheck then
+            velocity.Velocity = direction * speed
+        else
+            velocity:Destroy()
+            for i = 1, 10 do
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+                game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+                task.wait()
+            end
+            break
+        end
+        wait()
+    end
+end
+function Teleport(x,y,z,cd)
+	tp(x,y,z,10000)
+	task.wait(cd)
+end
+local PlaceID = game.PlaceId
+local AllIDs = {}
+local foundAnything = ""
+local actualHour = os.date("!*t").hour
+local Deleted = false
+local File = pcall(function()
+	AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json"))
+end)
+if not File then
+	table.insert(AllIDs, actualHour)
+	writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+end
+function TPReturner()
+	local Site;
+	if foundAnything == "" then
+		Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+	else
+		Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+	end
+	local ID = ""
+	if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+		foundAnything = Site.nextPageCursor
+	end
+	local num = 0;
+	for i,v in pairs(Site.data) do
+		local Possible = true
+		ID = tostring(v.id)
+		if tonumber(v.maxPlayers) > tonumber(v.playing) then
+			for _,Existing in pairs(AllIDs) do
+				if num ~= 0 then
+					if ID == tostring(Existing) then
+						Possible = false
+					end
+				else
+					if tonumber(actualHour) ~= tonumber(Existing) then
+						local delFile = pcall(function()
+							delfile("NotSameServers.json")
+							AllIDs = {}
+							table.insert(AllIDs, actualHour)
+						end)
+					end
+				end
+				num = num + 1
+			end
+			if Possible == true then
+				table.insert(AllIDs, ID)
+				wait()
+				pcall(function()
+					writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+					wait()
+					game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+				end)
+				wait(4)
+			end
+		end
+	end
+end
+function ServerTeleport()
+	while wait() do
+		pcall(function()
+			TPReturner()
+			if foundAnything ~= "" then
+				TPReturner()
+			end
+		end)
+	end
+end
+
+
+
+
+
+
+repeat --Change team
+	u1.Network:Invoke("RequestTeamChange", "Prisoners")
+	task.wait(0.1)
+until game.Players.LocalPlayer.Team.Name == "Prisoners"
+task.wait(0.5)
+for i, deleteparts in next, game:GetService("Workspace")[game.Players.LocalPlayer.Name]:GetChildren() do --Remove unneed part
+    if deleteparts.Name == "HumanoidRootPart" or deleteparts.Name == "Humanoid" or deleteparts.Name == "Animate" or deleteparts.Name == "Health" or deleteparts.Name ==  "Parachte" or deleteparts:IsA("Accessory") or deleteparts:IsA("BodyColors") or deleteparts:IsA("MeshPart") or deleteparts:IsA("Pants") or deleteparts:IsA("Shirt") or deleteparts:IsA("ForceField") or deleteparts:IsA("Tool") then
+    else
+        deleteparts:Destory()
+    end
+end
+for i = 1,10 do --Teleport to load map
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1831, 103, -1146)
+    task.wait(0.001)
+end
+require(game.ReplicatedStorage.Aero.Shared.Util).Network:Fire("RagdollUpdate",true) 
+for i = 1,15 do
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1831, 103, -1146)
+    task.wait(0.001)
+end
+for i = 1, 110 do
+	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1834, 225, -1167)
+	task.wait(0.001)
+end
+for i = 1, 140 do
+	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1834, 222, -1167)
+	task.wait(0.001)
+end
+dh = game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder")
+if dh and dh.enabled then
+    while game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text do
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(math.random(1818, 1853), math.random(225, 235), math.random(-1172, -1166))
+		task.wait(0.01)
+		if not game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") or not game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+			break
+		end
+    end
+	repeat
+		Teleport(73, 26, -157)
+	until not game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") or not game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled
+	require(game.ReplicatedStorage.Aero.Shared.Util).Network:Fire("RagdollUpdate",false)
+else
+    Notify("Club closed or game somehow managed to not let player play")
+	require(game.ReplicatedStorage.Aero.Shared.Util).Network:Fire("RagdollUpdate",false)
+	repeat --Change team
+		u1.Network:Invoke("RequestTeamChange", "Prisoners")
+		task.wait(0.1)
+	until game.Players.LocalPlayer.Team.Name == "Prisoners"
+	task.wait(3)
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+function DistanceCheck(x,y,z, distance)
+	local PlayerPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+	local Destination = Vector3.new(x,y,z)
+	return (PlayerPosition-Destination).magnitude < distance
+end
+function CreatePlat(seconds)
+	local PlayerRoot = game.Players.LocalPlayer.Character.HumanoidRootPart
+	local Plat = Instance.new("Part", game.Workspace)
+	Plat.Anchored = true
+	Plat.CFrame = CFrame.new(PlayerRoot.CFrame.X, PlayerRoot.CFrame.Y-3, PlayerRoot.CFrame.Z)
+	Plat.Size = Vector3.new(1000, 1, 1000)
+	Plat.Transparency = 1
+	task.spawn(function()
+		task.wait(seconds)
+		Plat:Destroy()
+	end)
+end
+
+function TeleportToBase()
+	success = false
+	local vim = game:service("VirtualInputManager")
+	hb = game:GetService("RunService").Heartbeat:Connect(function()
+		if not success then
+	    	if not game.Players.LocalPlayer.Character.Humanoid.SeatPart then
+	    	    if not success then
+	    	        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-91, 25.4, -173)
+	    	        vim:SendKeyEvent(true, "E", false, game)
+	    	        task.wait(0.1)
+	    	        vim:SendKeyEvent(false, "E", false, game)
+	    	    end
+	    	else
+	    	    success = true
+	    	    repeat
+	    	    vim:SendKeyEvent(true, "Space", false, game)
+	    	    task.wait(0.1)
+	    	    vim:SendKeyEvent(false, "Space", false, game)
+	    	    until not game.Players.LocalPlayer.Character.Humanoid.SeatPart
+	    	end
+		end
+	end)
+	repeat wait() until success
+	for i = 1, 10 do
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-91, 50, -173)
+		task.wait(0.001)
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-91, 25.4, -173)
+		task.wait(0.001)
+	end
+	task.wait(0.5)
+end
+
+
+
+function FastTeleport(x, y, z, speed, loops)
+	local targetPosition = Vector3.new(x, y, z)
+	local speed = speed
+	local maxForce = Vector3.new(math.huge, math.huge, math.huge)
+
+	local velocity = Instance.new("BodyVelocity")
+	velocity.MaxForce = maxForce
+	velocity.Velocity = Vector3.new(0, 0, 0)
+	velocity.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+
+	while true do
+		if canceltp then
+			canceltp = false
+			velocity:Destroy()
+			break
+		end
+		local currentPos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+		local direction = (targetPosition - currentPos).unit
+		local distance = (targetPosition - currentPos).magnitude
+		local distanceCheck = speed / 30
+		if distance >= distanceCheck then
+			velocity.Velocity = direction * speed
+		else
+			velocity:Destroy()
+			if loops then
+				for i = 1, loops do
+					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+					game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+					task.wait()
+				end
+			else
+				for i = 1, 10 do
+					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+					game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+					task.wait()
+				end
+			end
+			break
+		end
+		wait()
+	end
+end
+local vim = game:service("VirtualInputManager")
+function Click(key, HT, cd)
+	vim:SendKeyEvent(true, key, false, game)
+	task.wait(HT)
+	vim:SendKeyEvent(false, key, false, game)
+	task.wait(cd)
+end
+function InstaTeleport(x, y, z)
+	local LPRootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+	tp(LPRootPart.CFrame.X, 1000, LPRootPart.CFrame.Z, 100000)
+	tp(x, 1000, z, 100000)
+	tp(x, y, z, 100000)
+end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Deni210/require/main/noe", true))()
+
+
+
+
+--pyramide level 1
+if workspace.Heists.Pyramid:FindFirstChild("Level1") then
+	TeleportToBase()
+	if workspace.Heists.Pyramid.Level1:FindFirstChild("Saws") then
+		workspace.Heists.Pyramid.Level1.Saws:Destroy()
+	end
+
+	if workspace.Heists.Pyramid.Level1:FindFirstChild("SpikeTraps") then
+		workspace.Heists.Pyramid.Level1.SpikeTraps:Destroy()
+	end
+
+	if workspace.Heists.Pyramid.Level1:FindFirstChild("Flamethrowers") then
+		workspace.Heists.Pyramid.Level1.Flamethrowers:Destroy()
+	end
+	repeat
+		InstaTeleport(-271, 152, -1349)
+		task.wait(1)
+	until DistanceCheck(-271, 152, -1349, 2)
+	Teleport(-259.9783630371094, 153.32891845703125, -1348.44482421875, 0.4)
+	FastTeleport(-259.9783630371094, -30.32891845703125, -1348.44482421875, 300)
+	FastTeleport(-260.073486328125, -10.799825668334961, -1347.694580078125, 250)
+	FastTeleport(-430.83123779296875, -10.149826049804688, -1356.5574951171875, 600)
+	task.wait(1)
+	FastTeleport(-496.24127197265625, -28.899826049804688, -1277.6976318359375, 300)
+	FastTeleport(-511.6826477050781, -29.149845123291016, -1088.752197265625, 450)
+	Teleport(-480.03607177734375, -12.372106552124023, -1030.63427734375, 0.25)
+	Teleport(-470.2077941894531, -11.550172805786133, -1012.574462890625, 0.25)
+	Teleport(-399.81646728515625, -11.22412395477295, -1043.1368408203125, 0.25)
+	Teleport(-407.92156982421875, -56.265647888183594, -1055.1832275390625, 0.25)
+	Teleport(-430.45062255859375, -58.75510787963867, -1103.495361328125, 0.25)
+	Teleport(-419.61224365234375, -58.58015441894531, -1126.24072265625, 0.25)
+	Teleport(-408.54156494140625, -54.94552230834961, -1135.3724365234375, 0.25)
+	Teleport(-363.29071044921875, -58.75511169433594, -1127.7369384765625, 0.25)
+	Teleport(-349.4759216308594, -76.00708770751953, -1062.293212890625, 0.25)
+	Teleport(-319.15863037109375, -97.32572937011719, -1052.4222412109375, 0.25)
+	Teleport(-311.4169006347656, -100.3247299194336, -1070.478759765625, 0.25)
+	Teleport(-293.8904724121094, -103.14236450195312, -1065.981689453125, 0.25)
+	Teleport(-283.9091796875, -106.17094421386719, -1082.4317626953125, 0.2)
+	Teleport(-266.747802734375, -102.701416015625, -1090.825439453125, 0.2)
+	Teleport(-241.68760681152344, -109.03533935546875, -1097.42138671875, 0.2)
+	Teleport(-219.40557861328125, -111.62290954589844, -1084.5224609375, 0.2)
+	Teleport(-203.569091796875, -108.59306335449219, -1077.38818359375, 0.2)
+	Teleport(-156.3708038330078, -115.54326629638672, -1076.5118408203125, 0.2)
+	Teleport(-145.76405334472656, -115.54325866699219, -1048.1788330078125, 0.2)
+	Teleport(-132.7626190185547, -115.37649536132812, -1037.2127685546875, 0.2)
+	Teleport(-110.49177551269531, -115.45071411132812, -1023.2281494140625, 0.2)
+	Teleport(-56.11692810058594, -115.55068969726562, -1044.620361328125, 0.3)
+	Teleport(-2.0513861179351807, -108.30096435546875, -1058.7581787109375, 0.5)
+	Teleport(2.2426400184631348, -101.45064544677734, -1084.474365234375, 0.5)
+	Teleport(80.89337158203125, -100.32627868652344, -1091.24462890625, 0.5)
+	FastTeleport(149.97120666503906, -99.68843078613281, -1142.73388671875, 400)
+	repeat 
+		task.wait(0.01)
+	until game:GetService("Players").LocalPlayer.PlayerGui.Interactions:FindFirstChild("InteractionFrame")
+	_G.NoEWait()
+	for i = 1, 10 do
+		Click(Enum.KeyCode.E, 0.01)
+	end
+	Teleport(160.4329376220703, -98.54802703857422, -1150.81298828125, 0.2)
+	repeat 
+		task.wait(0.01)
+	until game:GetService("Players").LocalPlayer.PlayerGui.Interactions:FindFirstChild("InteractionFrame")
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			Teleport(121.98723602294922, -99.65458679199219, -1162.439697265625, 0.2)
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			Teleport(117.49003601074219, -96.54149627685547, -1171.9764404296875, 0.3)
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			Teleport(107.97606658935547, -94.787841796875, -1178.3402099609375, 0.2)
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	FastTeleport(107.97606658935547, -79.787841796875, -1178.3402099609375, 200)
+	Teleport(96.2521743774414, -79.03927612304688, -1169.535400390625, 0.2)
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	task.wait(0.5)
+	for i, deleteparts in next, game:GetService("Workspace")[game.Players.LocalPlayer.Name]:GetChildren() do --Remove unneed part
+		if deleteparts.Name == "HumanoidRootPart" or deleteparts.Name == "Humanoid" or deleteparts.Name == "Animate" or deleteparts.Name == "Health" or deleteparts.Name ==  "Parachte" or deleteparts:IsA("Accessory") or deleteparts:IsA("BodyColors") or deleteparts:IsA("MeshPart") or deleteparts:IsA("Pants") or deleteparts:IsA("Shirt") or deleteparts:IsA("ForceField") or deleteparts:IsA("Tool") then
+		else
+			deleteparts:Destory()
+		end
+	end
+	for i = 1,10 do --Teleport to load map
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(84.41801452636719, 25.25277328491211, -151.80941772460938)
+		task.wait(0.001)
+	end
+	require(game.ReplicatedStorage.Aero.Shared.Util).Network:Fire("RagdollUpdate",true) 
+	for i = 1,15 do
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(84.41801452636719, 25.25277328491211, -151.80941772460938)
+		task.wait(0.001)
+	end
+	task.wait(1)
+	repeat
+		Teleport(73, 26, -157)
+	until not game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") or not game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled
+	require(game.ReplicatedStorage.Aero.Shared.Util).Network:Fire("RagdollUpdate",false)
+	Teleport(-419.15, -2, -938.20, 0.2)
+	task.wait(0.3)
+end
+
+--pyramide level 2
+if workspace.Heists.Pyramid:FindFirstChild("Level2") then
+	TeleportToBase()
+    --Destroy damage parts
+	if workspace.Heists.Pyramid.Level2.PressurePlates:FindFirstChild("Plates") then
+		workspace.Heists.Pyramid.Level2.PressurePlates.Plates:Destroy()
+	end
+	if workspace.Heists.Pyramid.Level2:FindFirstChild("Flamethrowers") then
+		workspace.Heists.Pyramid.Level2.Flamethrowers:Destroy()
+	end
+
+    --Teleport to Prymide
+	repeat
+		InstaTeleport(-271, 152, -1349)
+		task.wait(1)
+	until DistanceCheck(-271, 152, -1349, 2)
+	task.wait(0.5)
+	Teleport(-262, 152, -1350, 0.2)
+	FastTeleport(-261.5158386230469, -44.15189743041992, -1348.6392822265625, 500)
+	task.wait(2)
+	if workspace.Heists.Pyramid.Level2.Gate.GateModel.Main.Position.Y < -51.3 then
+        repeat
+		    FastTeleport(-400.9442443847656, -49.48955535888672, -1363.1416015625, 700) --Start opening the doors
+		    task.wait(1)
+        until DistanceCheck(-400, -49, -1363, 2)
+		repeat 
+			task.wait(0.01)
+		until game:GetService("Players").LocalPlayer.PlayerGui.Interactions:FindFirstChild("InteractionFrame")
+		_G.NoEWait()
+		Click(Enum.KeyCode.E, 0.1)
+		FastTeleport(-293.45635986328125, -49.389522552490234, -1352.0794677734375, 700)
+		Teleport(-265.3514099121094, -44.15199279785156, -1361.5631103515625, 0.3)
+		repeat
+			FastTeleport(-32.951560974121094, -49.38951110839844, -1337.253173828125, 700)
+			task.wait(1)
+		until DistanceCheck(-32, -49, -1337, 2)
+		repeat 
+			task.wait(0.01)
+		until game:GetService("Players").LocalPlayer.PlayerGui.Interactions:FindFirstChild("InteractionFrame")
+		_G.NoEWait()
+		Click(Enum.KeyCode.E, 0.1)
+		FastTeleport(-203.08935546875, -49.38951873779297, -1349.2515869140625, 700)
+		Teleport(-224.36923217773438, -49.3895149230957, -1314.528564453125, 0.3)
+		Teleport(-265.7734375, -49.38951110839844, -1307.5555419921875, 0.3)
+		repeat
+			FastTeleport(-274.44232177734375, -49.38951873779297, -1169.9151611328125, 700)
+			task.wait(1)
+		until DistanceCheck(-274, -49, -1169, 2)
+		repeat 
+			task.wait(0.01)
+		until game:GetService("Players").LocalPlayer.PlayerGui.Interactions:FindFirstChild("InteractionFrame")
+		_G.NoEWait()
+		Click(Enum.KeyCode.E, 0.1)
+		FastTeleport(-263.9615173339844, -49.38951873779297, -1323.018310546875, 700)
+		Teleport(-255.08914184570312, -44.151885986328125, -1352.679931640625, 0.3)
+        Teleport(-254, 27,-1340)
+		CreatePlat(12)
+		for i = 1, 20 do
+			Teleport(-254, 27,-1340, 0.1)
+		end
+		task.wait(12)
+		repeat
+			Teleport(-255, -44, -1352, 0.75)
+		until DistanceCheck(-255, -44, -1352, 2)
+		if workspace.Heists.Pyramid.Level2.Gate.GateModel.Main.Position.Y < -51.3 then
+			repeat 
+				u1.Network:Invoke("RequestTeamChange", "Prisoners")
+				task.wait(0.1)
+			until game.Players.LocalPlayer.Team.Name == "Prisoners"
+			repeat
+				ServerTeleport()
+				task.wait(5)
+			until false
+		end
+	end
+	FastTeleport(-250.95640563964844, -51.389678955078125, -1541.6822509765625, 700)
+	Teleport(-288.4954833984375, -51.389556884765625, -1584.645751953125, 0.3)
+	FastTeleport(-288.4954833984375, -55.389556884765625, -1584.645751953125, 250)
+	FastTeleport(-444.3990173339844, -54.089569091796875, -1613.7449951171875, 500)
+	FastTeleport(-444.3990173339844, -50.089569091796875, -1613.7449951171875, 250)
+	FastTeleport(-459.66046142578125, -51.389556884765625, -1464.5352783203125, 500)
+	Teleport(-464.0158386230469, -51.389556884765625, -1448.1553955078125, 0.5)
+	Teleport(-445.59710693359375, -51.28956985473633, -1391.2342529296875, 0.5)
+
+	--stand
+	Teleport(-443.367919921875, -46.951271057128906, -1387.5042724609375, 0.3)
+	Teleport(-457.58154296875, -51.389556884765625, -1353.2666015625, 0.3)
+	Teleport(-449.5208435058594, -51.289573669433594, -1320.233154296875, 0.3)
+	Teleport(-462.4350891113281, -51.28956604003906, -1295.446044921875, 0.3)
+	Teleport(-472.9946594238281, -46.85499572753906, -1280.7718505859375, 0.3)
+	Teleport(-484.3677978515625, -51.289573669433594, -1248.0316162109375, 0.3)
+	FastTeleport(-481.0402526855469, -51.28956604003906, -1153.465087890625, 300)
+	Teleport(-478.8730163574219, -51.289573669433594, -1139.194580078125, 0.5)
+	FastTeleport(-462.03448486328125, -50.29161071777344, -959.3275146484375, 600)
+
+	--e buttons loading
+	repeat 
+		task.wait(0.01)
+	until game:GetService("Players").LocalPlayer.PlayerGui.Interactions:FindFirstChild("InteractionFrame")
+	_G.NoEWait()
+	for i = 1, 10 do
+		Click(Enum.KeyCode.E, 0.01)
+	end
+	--stand
+	Teleport(-456.3236389160156, -51.19826126098633, -946.1389770507812, 0.2)
+	repeat 
+		task.wait(0.01)
+	until game:GetService("Players").LocalPlayer.PlayerGui.Interactions:FindFirstChild("InteractionFrame")
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			Teleport(-430.8542175292969, -51.151248931884766, -974.5360717773438, 0.3)
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			Teleport(-420.2041931152344, -47.58612823486328, -973.3475341796875, 0.2)
+				for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			Teleport(-411.47296142578125, -45.71950912475586, -980.1796264648438, 0.2)
+				for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			Teleport(-408.20184326171875, -47.157997131347656, -970.6968383789062, 0.2)
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") and game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled then
+	    if game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Numerator.Text ~= game.Players.LocalPlayer.PlayerGui["All-InBackpackDisplayHolder"].MainHolder.Denominator.Text then
+			FastTeleport(-408.20184326171875, -29.157997131347656, -970.6968383789062, 200)
+			Teleport(-411.94256591796875, -29.82262420654297, -993.2972412109375, 0.2)
+			for i = 1, 10 do
+				Click(Enum.KeyCode.E, 0.01)
+			end
+	    end
+	end
+	task.wait(0.5)
+	for i, deleteparts in next, game:GetService("Workspace")[game.Players.LocalPlayer.Name]:GetChildren() do --Remove unneed part
+		if deleteparts.Name == "HumanoidRootPart" or deleteparts.Name == "Humanoid" or deleteparts.Name == "Animate" or deleteparts.Name == "Health" or deleteparts.Name ==  "Parachte" or deleteparts:IsA("Accessory") or deleteparts:IsA("BodyColors") or deleteparts:IsA("MeshPart") or deleteparts:IsA("Pants") or deleteparts:IsA("Shirt") or deleteparts:IsA("ForceField") or deleteparts:IsA("Tool") then
+		else
+			deleteparts:Destory()
+		end
+	end
+	for i = 1,10 do --Teleport to load map
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(84.41801452636719, 25.25277328491211, -151.80941772460938)
+		task.wait(0.001)
+	end
+	require(game.ReplicatedStorage.Aero.Shared.Util).Network:Fire("RagdollUpdate",true) 
+	for i = 1,15 do
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(84.41801452636719, 25.25277328491211, -151.80941772460938)
+		task.wait(0.001)
+	end
+	task.wait(1)
+	repeat
+		Teleport(73, 26, -157)
+	until not game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder") or not game.Players.LocalPlayer.PlayerGui:FindFirstChild("All-InBackpackDisplayHolder").enabled
+	require(game.ReplicatedStorage.Aero.Shared.Util).Network:Fire("RagdollUpdate",false)
+	Teleport(-419.15, -2, -938.20, 0.2)
+	task.wait(0.3)
+end
+
+
+
+
+
+
+
+
+task.wait(1)
+if ServerHop then
+	Notify("Server hopping")
+	repeat
+		ServerTeleport()
+		task.wait(5)
+	until false
+end
